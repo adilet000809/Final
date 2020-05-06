@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Final.Data;
+using Final.Repositories;
 using Final.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -52,6 +53,8 @@ namespace Final
                     Configuration["EmailSender:UserName"],
                     Configuration["EmailSender:Password"]
                     ));
+            services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.AddTransient<IProductRepository, ProductRepository>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -62,7 +65,6 @@ namespace Final
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
             }
             else
             {

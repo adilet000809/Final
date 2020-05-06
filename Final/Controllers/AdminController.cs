@@ -1,22 +1,37 @@
-﻿
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using Final.Models;
+using Final.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 
 namespace Final.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController: Controller
     {
-        private readonly RoleManager<IdentityRole> roleManager;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IHostingEnvironment _appEnvironment;
 
-        public AdminController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        public AdminController(RoleManager<IdentityRole> roleManager, 
+            UserManager<IdentityUser> userManager, 
+            ICategoryRepository categoryRepository, 
+            IProductRepository productRepository,
+            IHostingEnvironment appEnvironment)
         {
-            this.roleManager = roleManager;
-            this.userManager = userManager;
+            _roleManager = roleManager;
+            _userManager = userManager;
+            _categoryRepository = categoryRepository;
+            _productRepository = productRepository;
+            _appEnvironment = appEnvironment;
         }    
 
         [HttpGet]
@@ -34,7 +49,7 @@ namespace Final.Controllers
                 {
                     Name = model.RoleName
                 };
-                var result = await roleManager.CreateAsync(role);
+                var result = await _roleManager.CreateAsync(role);
 
                 if (result.Succeeded)
                 {
@@ -55,12 +70,12 @@ namespace Final.Controllers
         [HttpGet]
         public IActionResult ListRoles()
         {
-            return View(roleManager.Roles);
+            return View(_roleManager.Roles);
         }
 
         public async Task<IActionResult> EditRole(string id)
         {
-            var role = await roleManager.FindByIdAsync(id);
+            var role = await _roleManager.FindByIdAsync(id);
 
             if (role == null)
             {
@@ -74,9 +89,9 @@ namespace Final.Controllers
                 RoleName = role.Name
             };
 
-            foreach (var user in userManager.Users)
+            foreach (var user in _userManager.Users)
             {
-                if (await userManager.IsInRoleAsync(user, role.Name))
+                if (await _userManager.IsInRoleAsync(user, role.Name))
                 {
                     model.Users.Add(user.UserName); 
                 }
@@ -88,7 +103,7 @@ namespace Final.Controllers
         [HttpPost]
         public async Task<IActionResult> EditRole(EditRoleViewModel model)
         {
-            var role = await roleManager.FindByIdAsync(model.Id);
+            var role = await _roleManager.FindByIdAsync(model.Id);
 
             if (role == null)
             {
@@ -97,7 +112,7 @@ namespace Final.Controllers
             }
 
             role.Name = model.RoleName;
-            var result = await roleManager.UpdateAsync(role);
+            var result = await _roleManager.UpdateAsync(role);
 
             if (result.Succeeded)
             {
@@ -115,7 +130,7 @@ namespace Final.Controllers
         [HttpGet]
         public async Task<IActionResult> DeleteRole(string id)
         {
-            var role= await roleManager.FindByIdAsync(id);
+            var role= await _roleManager.FindByIdAsync(id);
 
             if (role == null)
             {
@@ -123,17 +138,17 @@ namespace Final.Controllers
                 return View("NotFound");
             }
 
-            foreach (var user in userManager.Users)
+            foreach (var user in _userManager.Users)
             {
 
-                if (await userManager.IsInRoleAsync(user, role.Name))
+                if (await _userManager.IsInRoleAsync(user, role.Name))
                 {
 
-                    await userManager.RemoveFromRoleAsync(user, role.Name);
+                    await _userManager.RemoveFromRoleAsync(user, role.Name);
                 }
             }
 
-            var result = await roleManager.DeleteAsync(role);
+            var result = await _roleManager.DeleteAsync(role);
 
             if (result.Succeeded)
             {
@@ -154,7 +169,7 @@ namespace Final.Controllers
         {
             ViewBag.roleId = roleId;
 
-            var role = await roleManager.FindByIdAsync(roleId);
+            var role = await _roleManager.FindByIdAsync(roleId);
 
             if (role == null)
             {
@@ -164,7 +179,7 @@ namespace Final.Controllers
             
             var model = new List<UserRoleViewModel>();
 
-            foreach (var user in userManager.Users)
+            foreach (var user in _userManager.Users)
             {
                 var userRoleViewModel = new UserRoleViewModel
                 {
@@ -172,7 +187,7 @@ namespace Final.Controllers
                     UserName = user.UserName,
                 };
 
-                if (await userManager.IsInRoleAsync(user, role.Name))
+                if (await _userManager.IsInRoleAsync(user, role.Name))
                 {
                     userRoleViewModel.IsSelected = true;
                 }
@@ -191,7 +206,7 @@ namespace Final.Controllers
         public async Task<IActionResult> EditUsersInRole(List<UserRoleViewModel> model, string roleId)
         {
             
-            var role = await roleManager.FindByIdAsync(roleId);
+            var role = await _roleManager.FindByIdAsync(roleId);
 
             if (role == null)
             {
@@ -201,18 +216,18 @@ namespace Final.Controllers
 
             for (var i = 0; i < model.Count; i++)
             {
-                var user  = await userManager.FindByIdAsync(model[i].UserId);
+                var user  = await _userManager.FindByIdAsync(model[i].UserId);
 
                 IdentityResult result = null;
 
-                if (model[i].IsSelected && !await userManager.IsInRoleAsync(user, role.Name))
+                if (model[i].IsSelected && !await _userManager.IsInRoleAsync(user, role.Name))
                 {
-                    result = await userManager.AddToRoleAsync(user, role.Name);
+                    result = await _userManager.AddToRoleAsync(user, role.Name);
                     
                 } 
-                else if(!model[i].IsSelected && await userManager.IsInRoleAsync(user, role.Name))
+                else if(!model[i].IsSelected && await _userManager.IsInRoleAsync(user, role.Name))
                 {
-                    result = await userManager.RemoveFromRoleAsync(user, role.Name);
+                    result = await _userManager.RemoveFromRoleAsync(user, role.Name);
                 }
 
                 if (result == null || !result.Succeeded) continue;
@@ -226,5 +241,250 @@ namespace Final.Controllers
             
             return RedirectToAction("EditRole", new {Id = roleId});
         }
+        
+        //Category
+        
+        [HttpGet]
+        public IActionResult ListCategories()
+        {
+            return View(_categoryRepository.GetAllCategory());
+        }
+        
+        [HttpGet]
+        public IActionResult CreateCategory()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory(CreateCategoryViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var category = new Category
+                {
+                    Name = model.CategoryName
+                };
+                var result = _categoryRepository.Add(category);
+
+                if (result != null)
+                {
+                    return RedirectToAction("ListCategories", "Admin");
+                    
+                }
+                
+            }
+
+            return View(model);
+        }
+        
+        public async Task<IActionResult> EditCategory(int id)
+        {
+            var category = _categoryRepository.GetCategory(id);
+
+            if (category == null)
+            {
+                ViewBag.ErrorMessage = $"Category cannot be found.";
+                return View("NotFound");
+            }
+            
+            var model = new EditCategoryViewModel
+            {
+                Id = category.Id,
+                CategoryName = category.Name
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCategory(EditCategoryViewModel model)
+        {
+            var category = _categoryRepository.GetCategory(model.Id);
+
+            if (category == null)
+            {
+                ViewBag.ErrorMessage = $"Category cannot be found.";
+                return View("NotFound");
+            }
+
+            category.Name = model.CategoryName;
+            var result = _categoryRepository.Update(category);
+
+            if (result != null)
+            {
+                return RedirectToAction("ListCategories");
+            }
+
+            return View(model);
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var category = _categoryRepository.GetCategory(id);
+
+            if (category == null)
+            {
+                ViewBag.ErrorMessage = $"Category cannot be found.";
+                return View("NotFound");
+            }
+
+            var result = _categoryRepository.Delete(id);
+
+            if (result != null)
+            {
+                return RedirectToAction("ListCategories");
+            }
+            
+            return RedirectToAction("ListCategories");
+            
+        }
+        
+        //Product
+
+        [HttpGet]
+        public IActionResult ListProducts()
+        {
+            return View(_productRepository.GetAllProduct());
+        }
+        
+        [HttpGet]
+        public IActionResult CreateProduct()
+        {
+            ViewBag.Categories = new SelectList(_categoryRepository.GetAllCategory(), "Id", "Name");
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateProduct(CreateProductViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string uniqueFileName = null;
+                {
+                    var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img");
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+                    var path = Path.Combine(uploadFolder, uniqueFileName);
+                    model.Image.CopyTo(new FileStream(path, FileMode.Create));
+                    
+                }
+
+                var category = _categoryRepository.GetCategory(model.CategoryId);
+
+                var product = new Product
+                {
+                    Name = model.Name,
+                    Category = category,
+                    Price = model.Price,
+                    Discount = model.Discount,
+                    Amount = model.Amount,
+                    Image = uniqueFileName,
+                    CategoryId = model.CategoryId,
+                    
+                };
+                
+                _productRepository.Add(product);
+                return RedirectToAction("ListProducts");
+            }
+
+            return View();
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> EditProduct(int id)
+        {
+            var product = _productRepository.GetProduct(id);
+
+            if (product == null)
+            {
+                ViewBag.ErrorMessage = $"Product cannot be found.";
+                return View("NotFound");
+            }
+            
+            var model = new EditProductViewModel
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Amount = product.Amount,
+                Price = product.Price,
+                Discount = product.Discount,
+                CategoryId = product.CategoryId,
+                OldImage = product.Image,
+                Image = null
+                
+            };
+
+            ViewBag.Categories = new SelectList(_categoryRepository.GetAllCategory(), "Id", "Name");
+            ViewBag.OldImage = product.Image;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditProduct(EditProductViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var product = _productRepository.GetProduct(model.Id);
+                product.Name = model.Name;
+                product.Amount = model.Amount;
+                product.Price = model.Price;
+                product.Discount = model.Discount;
+                product.CategoryId = model.CategoryId;
+                product.Category = _categoryRepository.GetCategory(model.CategoryId);
+
+                if (model.Image != null)
+                {
+                    string uniqueFileName = null;
+                    {
+                        
+                        var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img");
+                        var oldFile = Path.Combine(uploadFolder, model.OldImage);
+                        System.IO.File.Delete(oldFile);
+                        
+                        
+                        uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+                        var path = Path.Combine(uploadFolder, uniqueFileName);
+                        model.Image.CopyTo(new FileStream(path, FileMode.Create));
+                    
+                    }
+                    product.Image = uniqueFileName;
+                }
+                
+                _productRepository.Update(product);
+                return RedirectToAction("ListProducts");
+            }
+
+            return View();
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var product = _productRepository.GetProduct(id);
+
+            if (product == null)
+            {
+                ViewBag.ErrorMessage = $"Product cannot be found.";
+                return View("NotFound");
+            }
+            
+            var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img");
+            var image = Path.Combine(uploadFolder, product.Image);
+            System.IO.File.Delete(image);
+
+            var result = _productRepository.Delete(id);
+            
+
+            if (result != null)
+            {
+                return RedirectToAction("ListProducts");
+            }
+            
+            return RedirectToAction("ListProducts");
+            
+        }
+        
     }
 }

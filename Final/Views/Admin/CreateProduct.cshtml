@@ -1,0 +1,68 @@
+﻿@using Final.Repositories
+@model CreateProductViewModel
+@inject IProductRepository ProductRepository
+
+@{
+    ViewBag.Title = "Create product";
+    Layout = "_Layout";
+}
+
+<h2>Create product</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <form method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name"></label>
+                <input asp-for="Name" class="form-control"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CategoryId"></label>
+                <select asp-for="CategoryId" class="custom-select mr-sm-2" asp-items="ViewBag.Categories">
+                    <option value="">Select a category</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price"></label>
+                <input asp-for="Price" class="form-control"/>
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Discount"></label>
+                <input asp-for="Discount" class="form-control"/>
+                <span asp-validation-for="Discount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount"></label>
+                <input asp-for="Amount" class="form-control"/>
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image"></label>
+                <div class="custom-file">
+                    <input asp-for="Image" class="form-control custom-file-input"/>
+                    <label class="custom-file-label">Choose file</label>
+                    <span asp-validation-for="Image" class="text-danger"></span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Product</button>
+        </form>
+    </div>
+    
+    @section Scripts
+    {
+        <script>
+            $(document).ready(function() {
+                $('.custom-file-input').on('change', function() {
+                    let fileName = $(this).val().split("\\").pop();
+                    $('.custom-file-label').html(fileName);
+                })  
+            })
+        </script>
+    }
+    
+</div>

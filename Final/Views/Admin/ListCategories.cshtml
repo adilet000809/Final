@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Category>
+
+@{
+    ViewBag.Title = "All Categories";
+    Layout = "_Layout";
+}
+
+<h2>All Categories</h2>
+
+@if (Model.Any())
+{
+    <a class="btn btn-primary mb-3 w-auto" asp-controller="Admin" asp-action="CreateCategory">Create</a>
+    
+    foreach (var category in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-header">
+                Categories
+            </div>
+            <div class="card-body">
+                <h5>@category.Name</h5>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-danger" asp-controller="Admin" asp-action="DeleteCategory" asp-route-id="@category.Id">Delete</a>
+                <a class="btn btn-primary" asp-controller="Admin" asp-action="EditCategory" asp-route-id="@category.Id">Edit</a>
+
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            There are no categories
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Create a category</h5>
+            <a class="btn btn-primary w-auto" asp-controller="Admin" asp-action="CreateCategory">Create</a>
+        </div>
+    </div>
+}
