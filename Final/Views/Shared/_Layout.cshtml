@@ -8,6 +8,8 @@
     <title>@ViewData["Title"] - Final</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css"/>
+    <link rel="stylesheet" href="~/css/pagination.css"/>
+    <link rel="stylesheet" href="~/css/style.css"/>
 </head>
 <body>
 <header>
@@ -30,7 +32,10 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="ListCategories">Categories</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="ListProducts">Products</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="ListTires">Tires</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="ListWheels">Wheels</a>
                         </li>
                     }
                     <li class="nav-item">
@@ -53,6 +58,7 @@
     </div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)

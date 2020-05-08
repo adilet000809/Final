@@ -2,3 +2,192 @@
     ViewData["Title"] = "Online Shop";
 }
 
+<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#tires">Tires</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#wheels">Wheels</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="row">
+    <div id="app" class="tab-content">
+        <div id="tires" class="container tab-pane active"><br>
+            <div class="row">
+                <label for="season">Season</label>
+                <select id="season" name="season" v-model="tireForm.season" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="1">Summer</option>
+                    <option value="2">Winter</option>
+                    <option value="3">All</option>
+                </select>
+                <label for="width" class="ml-3">Width</label>
+                <select id="width" name="width" v-model="tireForm.width" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="135">135</option>
+                    <option value="145">145</option>
+                    <option value="155">155</option>
+                    <option value="165">165</option>
+                    <option value="175">175</option>
+                    <option value="185">185</option>
+                    <option value="195">195</option>
+                    <option value="205">205</option>
+                    <option value="215">215</option>
+                    <option value="225">225</option>
+                    <option value="235">235</option>
+                </select>
+                <label for="height" class="ml-3">Height</label>
+                <select id="height" name="height" v-model="tireForm.height" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="30">30</option>
+                    <option value="35">35</option>
+                    <option value="40">40</option>
+                    <option value="45">45</option>
+                    <option value="50">50</option>
+                    <option value="55">55</option>
+                    <option value="60">60</option>
+                    <option value="65">65</option>
+                    <option value="70">70</option>
+                    <option value="75">75</option>
+                    <option value="80">80</option>
+                    <option value="85">85</option>
+                </select>
+                <label for="diameter" class="ml-3">Diameter</label>
+                <select id="diameter" name="diameter" v-model="tireForm.diameter" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="R12">R12</option>
+                    <option value="R13">R13</option>
+                    <option value="R14">R14</option>
+                    <option value="R15">R15</option>
+                    <option value="R16">R16</option>
+                    <option value="R17">R17</option>
+                    <option value="R18">R18</option>
+                    <option value="R19">R19</option>
+                    <option value="R20">R20</option>
+                    <option value="R21">R21</option>
+                    <option value="R22">R22</option>
+                    <option value="R23">R23</option>
+                    <option value="R24">R24</option>
+                </select>
+                <button class="btn btn-primary ml-3" v-on:click.prevent="fetchTires(1)">Search</button>
+            </div>
+            <section class="products">
+                <div class="product-card" v-for="tire in tires">
+                    <div class="product-image">
+                        <img alt="" v-bind:src="tire.image">
+                    </div>
+                    <div class="product-info">
+                        <a href="#"><h5>{{tire.name}}</h5></a>
+                        <h6>{{tire.price}} KZT</h6>
+                    </div>
+                </div>
+            </section>
+            <pagination
+                :current="currentPage"
+                :total-pages="totalPages"
+                v-on:page-changed="fetchTires">
+            </pagination>
+        </div>
+        <div id="wheels" class="container tab-pane fade"><br>
+            <div class="row">
+                <label for="hole">Holes</label>
+                <select id="hole" name="hole" v-model="wheelForm.hole" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+                <label for="wheelWidth" class="ml-3">Width</label>
+                <select id="wheelWidth" name="width" v-model="wheelForm.width" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="5.0">5.0</option>
+                    <option value="5.5">5.5</option>
+                    <option value="6.0">6.0</option>
+                    <option value="7.0">7.0</option>
+                    <option value="7.5">7.5</option>
+                    <option value="8.0">8.0</option>
+                    <option value="9.0">9.0</option>
+                </select>
+                <label for="wheelDiameter" class="ml-3">Diameter</label>
+                <select id="wheelDiameter" name="diameter" v-model="wheelForm.diameter" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                </select>
+                <label for="holeDiameter" class="ml-3">Diameter</label>
+                <select id="holeDiameter" name="holeDiameter" v-model="wheelForm.holeDiameter" class="custom-select w-auto ml-2">
+                    <option value=""></option>
+                    <option value="98">98</option>
+                    <option value="100">100</option>
+                    <option value="112">112</option>
+                    <option value="114">114</option>
+                    <option value="115">115</option>
+                    <option value="120">120</option>
+                    <option value="130">130</option>
+                    <option value="150">150</option>
+                </select>
+                
+                <button class="btn btn-primary ml-3" v-on:click.prevent="fetchWheels(1)">Search</button>
+            </div>
+            
+            <section class="products">
+                <div class="product-card" v-for="wheel in wheels">
+                    <div class="product-image">
+                        <img alt="" v-bind:src="wheel.image">
+                    </div>
+                    <div class="product-info">
+                        <a href="#"><h5>{{wheel.name}}</h5></a>
+                        <h6>{{wheel.price}} KZT</h6>
+                    </div>
+                </div>
+            </section>
+            
+            <pagination
+                :current="currentPage"
+                :total-pages="totalPages"
+                v-on:page-changed="fetchWheels">
+            </pagination>
+            
+        </div>
+    </div>
+    <template id="pagination-template">
+        <div class="pagination">
+            <div class="pagination__left">
+                <a href="#" v-if="hasPrev()" v-on:click.stop.prevent="changePage(prevPage)">Previous</a>
+            </div>
+            <div class="pagination__mid">
+                <ul>
+                    <li v-if="hasFirst()"><a href="#" v-on:click.stop.prevent="changePage(1)">1</a></li>
+                    <li v-if="hasFirst()">...</li>
+                    <li v-for="page in pages">
+                        <a href="#" v-on:click.stop.prevent="changePage(page)" :class="{ current: current == page }">
+                            {{ page }}
+                        </a>
+                    </li>
+                    <li v-if="hasLast()">...</li>
+                    <li v-if="hasLast()"><a href="#" v-on:click.stop.prevent="changePage(totalPages)">{{ totalPages }}</a></li>
+                </ul>
+            </div>
+            <div class="pagination__right">
+                <a href="#" v-if="hasNext()" v-on:click.stop.prevent="changePage(nextPage)">Next</a>
+            </div>
+        </div>
+    </template>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+<script src="~/js/pagination.js"></script>
+<script src="~/js/search.js"></script>

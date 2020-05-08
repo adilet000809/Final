@@ -1,0 +1,105 @@
+﻿@model EditWheelViewModel
+
+@{
+    ViewBag.Title = "Edit Wheel";
+    Layout = "_Layout";
+}
+
+<h2>Edit Role</h2>
+
+<form method="post" class="mt-3" enctype="multipart/form-data">
+    <div class="form-group row">
+        <label asp-for="Id" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Id" disabled class="form-control"/>
+        </div>
+        <input type="hidden" asp-for="OldImage"/>
+    </div>
+    <div class="form-group row">
+            <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Name" class="form-control"/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+    <div class="form-group row">
+        <label asp-for="CategoryId" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input type="hidden" asp-for="CategoryId" value="2"/>
+            <select disabled="" asp-for="CategoryId" class="custom-select mr-sm-2">
+                <option value="2">Wheel</option>
+            </select>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Width"></label>
+        <input asp-for="Width" class="form-control"/>
+        <span asp-validation-for="Width" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Hole"></label>
+        <input asp-for="Hole" class="form-control"/>
+        <span asp-validation-for="Hole" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="HoleDiameter"></label>
+        <input asp-for="HoleDiameter" class="form-control"/>
+        <span asp-validation-for="HoleDiameter" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Diameter"></label>
+        <input asp-for="Diameter" class="form-control"/>
+        <span asp-validation-for="Diameter" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <input asp-for="Description" class="form-control"/>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group row">
+        <label asp-for="Price" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Price" class="form-control"/>
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label asp-for="Image" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <div class="custom-file">
+                <input asp-for="Image" class="form-control custom-file-input"/>
+                <label class="custom-file-label">Choose file if you want to change</label>
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group row">
+        <div class= "col-4">
+            <img alt="Product" src="~/img/wheel/@ViewBag.OldImage" class="card-img"/>
+        </div>
+    </div>
+    
+    <div asp-validation-summary="All" class="text-danger"></div>
+    
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <a asp-action="ListWheels" class="btn btn-primary">Cancel</a>
+        </div>
+    </div>
+    
+</form>
+
+@section Scripts
+    {
+        <script>
+            $(document).ready(function() {
+                $('.custom-file-input').on('change', function() {
+                    let fileName = $(this).val().split("\\").pop();
+                    $('.custom-file-label').html(fileName);
+                })  
+            })
+        </script>
+    }

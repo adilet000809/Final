@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Final.Models
 {
@@ -16,12 +15,10 @@ namespace Final.Models
         [Required]
         public string Image { get; set; }
         [Required]
-        public int Discount { get; set; }
-        [Required]
-        public int Amount { get; set; }
+        public string Description { get; set; }
         [Required]
         public int CategoryId { get; set; }
         [Required]
-        public virtual Category Category { get; set; }
+        public Category Category { get; set; }
     }
 }

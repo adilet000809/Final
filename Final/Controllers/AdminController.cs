@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Hosting;
+using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 namespace Final.Controllers
 {
@@ -18,21 +18,44 @@ namespace Final.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IProductRepository _productRepository;
-        private readonly IHostingEnvironment _appEnvironment;
+        private readonly ITireRepository _tireRepository;
+        private readonly IWheelRepository _wheelRepository;
+        private static IHostingEnvironment _appEnvironment;
 
         public AdminController(RoleManager<IdentityRole> roleManager, 
             UserManager<IdentityUser> userManager, 
             ICategoryRepository categoryRepository, 
-            IProductRepository productRepository,
+            ITireRepository tireRepository,
+            IWheelRepository wheelRepository,
             IHostingEnvironment appEnvironment)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _categoryRepository = categoryRepository;
-            _productRepository = productRepository;
+            _tireRepository = tireRepository;
             _appEnvironment = appEnvironment;
-        }    
+            _wheelRepository = wheelRepository;
+        }
+
+        private static string UploadImageTire(CreateTireViewModel model)
+        {
+            var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\tire");
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+            var path = Path.Combine(uploadFolder, uniqueFileName);
+            model.Image.CopyTo(new FileStream(path, FileMode.Create));
+
+            return uniqueFileName;
+        }
+        
+        private static string UploadImageWheel(CreateWheelViewModel model)
+        {
+            var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\wheel");
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+            var path = Path.Combine(uploadFolder, uniqueFileName);
+            model.Image.CopyTo(new FileStream(path, FileMode.Create));
+
+            return uniqueFileName;
+        }
 
         [HttpGet]
         public IActionResult CreateRole()
@@ -344,145 +367,266 @@ namespace Final.Controllers
         //Product
 
         [HttpGet]
-        public IActionResult ListProducts()
+        public IActionResult ListTires()
         {
-            return View(_productRepository.GetAllProduct());
+            return View(_tireRepository.GetAllTires());
         }
         
         [HttpGet]
-        public IActionResult CreateProduct()
+        public IActionResult CreateTire()
         {
-            ViewBag.Categories = new SelectList(_categoryRepository.GetAllCategory(), "Id", "Name");
             return View();
         }
 
         [HttpPost]
-        public IActionResult CreateProduct(CreateProductViewModel model)
+        public IActionResult CreateTire(CreateTireViewModel model)
         {
             if (ModelState.IsValid)
             {
-                string uniqueFileName = null;
-                {
-                    var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img");
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
-                    var path = Path.Combine(uploadFolder, uniqueFileName);
-                    model.Image.CopyTo(new FileStream(path, FileMode.Create));
-                    
-                }
 
                 var category = _categoryRepository.GetCategory(model.CategoryId);
 
-                var product = new Product
+                var tire = new Tire
                 {
                     Name = model.Name,
                     Category = category,
                     Price = model.Price,
-                    Discount = model.Discount,
-                    Amount = model.Amount,
-                    Image = uniqueFileName,
+                    Width = model.Width,
+                    Height = model.Height,
+                    Diameter = model.Diameter,
+                    Description = model.Description,
+                    Image = UploadImageTire(model),
+                    Season = model.Season,
                     CategoryId = model.CategoryId,
-                    
                 };
                 
-                _productRepository.Add(product);
-                return RedirectToAction("ListProducts");
+                _tireRepository.Add(tire);
+                return RedirectToAction("ListTires");
             }
 
             return View();
         }
         
         [HttpGet]
-        public async Task<IActionResult> EditProduct(int id)
+        public async Task<IActionResult> EditTire(int id)
         {
-            var product = _productRepository.GetProduct(id);
+            var tire = _tireRepository.GetTire(id);
 
-            if (product == null)
+            if (tire == null)
             {
                 ViewBag.ErrorMessage = $"Product cannot be found.";
                 return View("NotFound");
             }
             
-            var model = new EditProductViewModel
+            var model = new EditTireViewModel
             {
-                Id = product.Id,
-                Name = product.Name,
-                Amount = product.Amount,
-                Price = product.Price,
-                Discount = product.Discount,
-                CategoryId = product.CategoryId,
-                OldImage = product.Image,
+                Id = tire.Id,
+                Name = tire.Name,
+                Price = tire.Price,
+                Width = tire.Width,
+                Height = tire.Height,
+                Diameter = tire.Diameter,
+                Description = tire.Description,
+                CategoryId = tire.CategoryId,
+                Season = tire.Season,
+                OldImage = tire.Image,
                 Image = null
                 
             };
 
             ViewBag.Categories = new SelectList(_categoryRepository.GetAllCategory(), "Id", "Name");
-            ViewBag.OldImage = product.Image;
+            ViewBag.OldImage = tire.Image;
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditProduct(EditProductViewModel model)
+        public async Task<IActionResult> EditTire(EditTireViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var product = _productRepository.GetProduct(model.Id);
-                product.Name = model.Name;
-                product.Amount = model.Amount;
-                product.Price = model.Price;
-                product.Discount = model.Discount;
-                product.CategoryId = model.CategoryId;
-                product.Category = _categoryRepository.GetCategory(model.CategoryId);
+                var tire = _tireRepository.GetTire(model.Id);
+                tire.Name = model.Name;
+                tire.Width = model.Width;
+                tire.Height = model.Height;
+                tire.Description = model.Description;
+                tire.Diameter = model.Diameter;
+                tire.Season = model.Season;
+                tire.Price = model.Price;
+                tire.CategoryId = model.CategoryId;
+                tire.Category = _categoryRepository.GetCategory(model.CategoryId);
 
                 if (model.Image != null)
                 {
-                    string uniqueFileName = null;
-                    {
-                        
-                        var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img");
-                        var oldFile = Path.Combine(uploadFolder, model.OldImage);
-                        System.IO.File.Delete(oldFile);
-                        
-                        
-                        uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
-                        var path = Path.Combine(uploadFolder, uniqueFileName);
-                        model.Image.CopyTo(new FileStream(path, FileMode.Create));
+                    var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\tire");
+                    var oldFile = Path.Combine(uploadFolder, model.OldImage);
+                    System.IO.File.Delete(oldFile);
                     
-                    }
-                    product.Image = uniqueFileName;
+                    tire.Image = UploadImageTire(model);
                 }
                 
-                _productRepository.Update(product);
-                return RedirectToAction("ListProducts");
+                _tireRepository.Update(tire);
+                return RedirectToAction("ListTires");
             }
 
             return View();
         }
         
         [HttpGet]
-        public async Task<IActionResult> DeleteProduct(int id)
+        public async Task<IActionResult> DeleteTire(int id)
         {
-            var product = _productRepository.GetProduct(id);
+            var tire = _tireRepository.GetTire(id);
 
-            if (product == null)
+            if (tire == null)
             {
                 ViewBag.ErrorMessage = $"Product cannot be found.";
                 return View("NotFound");
             }
             
-            var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img");
-            var image = Path.Combine(uploadFolder, product.Image);
+            var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\tire");
+            var image = Path.Combine(uploadFolder, tire.Image);
             System.IO.File.Delete(image);
 
-            var result = _productRepository.Delete(id);
+            var result = _tireRepository.Delete(id);
             
 
             if (result != null)
             {
-                return RedirectToAction("ListProducts");
+                return RedirectToAction("ListTires");
             }
             
-            return RedirectToAction("ListProducts");
+            return RedirectToAction("ListTires");
+            
+        }
+        
+        [HttpGet]
+        public IActionResult ListWheels()
+        {
+            return View(_wheelRepository.GetAllWheels());
+        }
+        
+        [HttpGet]
+        public IActionResult CreateWheel()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CreateWheel(CreateWheelViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+
+                var category = _categoryRepository.GetCategory(model.CategoryId);
+
+                var wheel = new Wheel()
+                {
+                    Name = model.Name,
+                    Category = category,
+                    Price = model.Price,
+                    Width = model.Width,
+                    Hole = model.Hole,
+                    HoleDiameter = model.HoleDiameter,
+                    Description = model.Description,
+                    Diameter = model.Diameter,
+                    Image = UploadImageWheel(model),
+                    CategoryId = model.CategoryId,
+                };
+                
+                _wheelRepository.Add(wheel);
+                return RedirectToAction("ListWheels");
+            }
+
+            return View();
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> EditWheel(int id)
+        {
+            var wheel = _wheelRepository.GetWheel(id);
+
+            if (wheel == null)
+            {
+                ViewBag.ErrorMessage = $"Product cannot be found.";
+                return View("NotFound");
+            }
+            
+            var model = new EditWheelViewModel
+            {
+                Id = wheel.Id,
+                Name = wheel.Name,
+                Price = wheel.Price,
+                Diameter = wheel.Diameter,
+                Hole = wheel.Hole,
+                HoleDiameter = wheel.HoleDiameter,
+                Description = wheel.Description,
+                CategoryId = wheel.CategoryId,
+                OldImage = wheel.Image,
+                Image = null
+                
+            };
+
+            ViewBag.OldImage = wheel.Image;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditWheel(EditWheelViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var wheel = _wheelRepository.GetWheel(model.Id);
+                wheel.Name = model.Name;
+                wheel.Width = model.Width;
+                wheel.HoleDiameter = model.HoleDiameter;
+                wheel.Description = model.Description;
+                wheel.Diameter = model.Diameter;
+                wheel.Hole = model.Hole;
+                wheel.Price = model.Price;
+                wheel.CategoryId = model.CategoryId;
+                wheel.Category = _categoryRepository.GetCategory(model.CategoryId);
+
+                if (model.Image != null)
+                {
+                    var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\wheel");
+                    var oldFile = Path.Combine(uploadFolder, model.OldImage);
+                    System.IO.File.Delete(oldFile);
+                    
+                    wheel.Image = UploadImageWheel(model);
+                }
+                
+                _wheelRepository.Update(wheel);
+                return RedirectToAction("ListWheels");
+            }
+
+            return View();
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> DeleteWheel(int id)
+        {
+            var wheel = _wheelRepository.GetWheel(id);
+
+            if (wheel == null)
+            {
+                ViewBag.ErrorMessage = $"Product cannot be found.";
+                return View("NotFound");
+            }
+            
+            var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\wheel");
+            var image = Path.Combine(uploadFolder, wheel.Image);
+            System.IO.File.Delete(image);
+
+            var result = _wheelRepository.Delete(id);
+            
+
+            if (result != null)
+            {
+                return RedirectToAction("ListWheels");
+            }
+            
+            return RedirectToAction("ListWheels");
             
         }
         
