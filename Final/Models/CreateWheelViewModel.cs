@@ -12,7 +12,7 @@ namespace Final.Models
         [Required]
         public int CategoryId { get; set; }
         [Required]
-        public int Width { get; set; }
+        public double Width { get; set; }
         [Required]
         public int Diameter { get; set; }
         [Required]
@@ -24,6 +24,6 @@ namespace Final.Models
         [Required]
         public double Price { get; set; }
         [Required]
-        public IFormFile Image { get; set; }
+        public virtual IFormFile Image { get; set; }
     }
 }

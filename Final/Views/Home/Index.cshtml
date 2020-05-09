@@ -81,7 +81,7 @@
                         <img alt="" v-bind:src="tire.image">
                     </div>
                     <div class="product-info">
-                        <a href="#"><h5>{{tire.name}}</h5></a>
+                        <a v-bind:href="'Home/TireDetails/' + tire.id"><h5>{{tire.name}}</h5></a>
                         <h6>{{tire.price}} KZT</h6>
                     </div>
                 </div>

@@ -42,8 +42,9 @@ namespace Final.Controllers
             var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\tire");
             var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
             var path = Path.Combine(uploadFolder, uniqueFileName);
-            model.Image.CopyTo(new FileStream(path, FileMode.Create));
-
+            var fileStream = new FileStream(path, FileMode.Create);
+            model.Image.CopyTo(fileStream);
+            fileStream.Close();
             return uniqueFileName;
         }
         
@@ -52,8 +53,9 @@ namespace Final.Controllers
             var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\wheel");
             var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
             var path = Path.Combine(uploadFolder, uniqueFileName);
-            model.Image.CopyTo(new FileStream(path, FileMode.Create));
-
+            var fileStream = new FileStream(path, FileMode.Create);
+            model.Image.CopyTo(fileStream);
+            fileStream.Close();
             return uniqueFileName;
         }
 
@@ -458,11 +460,13 @@ namespace Final.Controllers
 
                 if (model.Image != null)
                 {
+                    tire.Image = UploadImageTire(model);
+                    
                     var uploadFolder = Path.Combine(_appEnvironment.ContentRootPath + "\\wwwroot\\img\\tire");
                     var oldFile = Path.Combine(uploadFolder, model.OldImage);
                     System.IO.File.Delete(oldFile);
                     
-                    tire.Image = UploadImageTire(model);
+                    
                 }
                 
                 _tireRepository.Update(tire);
@@ -556,6 +560,7 @@ namespace Final.Controllers
                 Id = wheel.Id,
                 Name = wheel.Name,
                 Price = wheel.Price,
+                Width = wheel.Width,
                 Diameter = wheel.Diameter,
                 Hole = wheel.Hole,
                 HoleDiameter = wheel.HoleDiameter,
