@@ -10,5 +10,7 @@ namespace Final.Repositories
         Cart Add(Cart cart);
         Cart Delete(int id);
         Cart Update(Cart cart);
+
+        void AddOrUpdate(Cart cart);
     }
 }

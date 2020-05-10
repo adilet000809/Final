@@ -6,67 +6,66 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Final.Repositories
 {
-    public class CartRepository: ICartRepository
+    public class CartItemRepository: ICartItemRepository
     {
         private readonly ApplicationDbContext _context;
 
-        public CartRepository(ApplicationDbContext context)
+        public CartItemRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
 
-        public Cart GetCart(int id)
+        public CartItem GetCartItem(int id)
         {
-            return _context.Carts.Find(id);
+            return _context.CartItems.Find(id);
         }
 
-        public IEnumerable<Cart> GetAllCarts()
+        public IEnumerable<CartItem> GetAllCartItems()
         {
-            return _context.Carts;
+            return _context.CartItems;
         }
 
-        public Cart Add(Cart cart)
+        public CartItem Add(CartItem cartItem)
         {
-            _context.Carts.Add(cart);
+            _context.CartItems.Add(cartItem);
             _context.SaveChanges();
-            return cart;
+            return cartItem;
         }
 
-        public Cart Delete(int id)
+        public CartItem Delete(int id)
         {
-            var cart = _context.Carts.Find(id);
-            if (cart == null) return null;
-            _context.Carts.Remove(cart);
+            var cartItem = _context.CartItems.Find(id);
+            if (cartItem == null) return null;
+            _context.CartItems.Remove(cartItem);
             _context.SaveChanges();
-            return cart;
+            return cartItem;
         }
 
-        public Cart Update(Cart cart)
+        public CartItem Update(CartItem cartItem)
         {
-            var c = _context.Carts.Attach(cart);
+            var c = _context.CartItems.Attach(cartItem);
             c.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             _context.SaveChanges();
-            return cart;
+            return cartItem;
         }
 
-        public void AddOrUpdate(Cart cart)
+        public void AddOrUpdate(CartItem cartItem)
         {
-            var entry = _context.Entry(cart);
+            var entry = _context.Entry(cartItem);
             switch (entry.State)  
             {  
                 case EntityState.Detached:  
-                    Add(cart);  
+                    Add(cartItem);  
                     break;  
                 case EntityState.Modified:  
-                    Update(cart);  
+                    Update(cartItem);  
                     break;  
                 case EntityState.Added:  
-                    Add(cart);  
+                    Add(cartItem);  
                     break;  
                 case EntityState.Unchanged:  
                     break;
-
                 default:  
                     throw new ArgumentOutOfRangeException();  
             }  

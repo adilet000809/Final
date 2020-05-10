@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Order>
+
+@{
+    ViewBag.Title = "Orders";
+    Layout = "_Layout";
+}
+
+<h2>Orders</h2>
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-12">
+            @if (Model.Any())
+            {
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td>@order.Id</td>
+                                <td>@order.Customer.Email</td>
+                                <td>@order.IsAccepted</td>
+                                <td><a asp-controller="Admin" asp-action="OrderDetails" asp-route-id="@order.Id" class="btn btn-primary">Process</a></td>
+                            </tr>
+                        }
+                    </tbody>
+            
+                </table>
+            }
+            else
+            {
+                <h2 class="text-center">No orders yet.</h2>
+            }
+        </div>
+    </div>
+</div>

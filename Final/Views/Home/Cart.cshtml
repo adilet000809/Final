@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Cart";
+    Layout = "_Layout";
+}
+
+<h2>Cart</h2>
+
+<div class="container mt-3" id="cart">
+    <div class="row">
+        <div v-if="!empty" class="col-12">
+            <p v-if="error" class="text-center text-danger">{{errorDescription}}</p>
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in cartItems">
+                    <td>{{item.product.name}}</td>
+                    <td>{{item.quantity}}</td>
+                    <td>{{item.quantity * item.product.price}} KZT</td>
+                    <td><button :item-id="item.id" v-on:click.prevent="deleteCartItem" class="btn btn-danger">Remove</button></td>
+                </tr>
+                </tbody>
+            </table>
+            <p>Total: {{total}} KZT</p>
+            <a asp-controller="Home" asp-action="MakeOrder" class="btn btn-success">Order</a>
+        </div>
+        <div v-if="empty" class="col-12">
+            <h2 class="text-center">Your cart is emtpy</h2>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+<script src="~/js/cart.js"></script>

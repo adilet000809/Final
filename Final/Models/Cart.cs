@@ -11,5 +11,8 @@ namespace Final.Models
         public string CustomerId { get; set; }
         [Required]
         public IdentityUser Customer { get; set; }
+        
+        public bool IsOrdered { get; set; }
+        
     }
 }

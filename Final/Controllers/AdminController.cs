@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Final.Models;
 using Final.Repositories;
@@ -20,6 +21,9 @@ namespace Final.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly ITireRepository _tireRepository;
         private readonly IWheelRepository _wheelRepository;
+        private readonly IOrderRepository _orderRepository;
+        private readonly ICartRepository _cartRepository;
+        private readonly ICartItemRepository _cartItemRepository;
         private static IHostingEnvironment _appEnvironment;
 
         public AdminController(RoleManager<IdentityRole> roleManager, 
@@ -27,6 +31,9 @@ namespace Final.Controllers
             ICategoryRepository categoryRepository, 
             ITireRepository tireRepository,
             IWheelRepository wheelRepository,
+            IOrderRepository orderRepository,
+            ICartRepository cartRepository,
+            ICartItemRepository cartItemRepository,
             IHostingEnvironment appEnvironment)
         {
             _roleManager = roleManager;
@@ -35,6 +42,9 @@ namespace Final.Controllers
             _tireRepository = tireRepository;
             _appEnvironment = appEnvironment;
             _wheelRepository = wheelRepository;
+            _orderRepository = orderRepository;
+            _cartRepository = cartRepository;
+            _cartItemRepository = cartItemRepository;
         }
 
         private static string UploadImageTire(CreateTireViewModel model)
@@ -633,6 +643,63 @@ namespace Final.Controllers
             
             return RedirectToAction("ListWheels");
             
+        }
+
+        [HttpGet]
+        public IActionResult ListOrders()
+        {
+            var orders = _orderRepository.GetAllOrder();
+            foreach (var order in orders)
+            {
+                order.Customer = _userManager.FindByIdAsync(order.CustomerId).Result;
+            }
+            
+            return View(orders);
+        }
+        
+        [HttpGet]
+        public IActionResult OrderDetails(int id)
+        {
+            var order = _orderRepository.GetOrder(id);
+            var cartItems = _cartItemRepository.GetAllCartItems().Where(c => c.CartId == order.CartId);
+            var total = 0.0;
+            foreach (var cartItem in cartItems)
+            {
+                var product = _tireRepository.GetTire(cartItem.ProductId) ?? (Product) _wheelRepository.GetWheel(cartItem.ProductId);
+                cartItem.Product = product;
+                total += product.Price;
+            }
+
+            order.Customer = _userManager.FindByIdAsync(order.CustomerId).Result;
+            ViewBag.Order = order;
+            ViewBag.Products = cartItems;
+            ViewBag.Total = total;
+            return order == null ? View("NotFound") : View();
+        }
+        
+        [HttpGet]
+        public IActionResult AcceptOrder(int id)
+        {
+            var order = _orderRepository.GetOrder(id);
+            if (order != null)
+            {
+                order.IsAccepted = true;
+                _orderRepository.Update(order);
+                return RedirectToAction("ListOrders");
+            }
+            ViewBag.ErrorMessage = $"Order cannot be found";
+            return View("NotFound");
+
+        }
+        
+        [HttpGet]
+        public IActionResult DeleteOrder(int id)
+        {
+            var order = _orderRepository.Delete(id);
+            if (order != null) return RedirectToAction("ListOrders");
+            ViewBag.ErrorMessage = $"Order cannot be found";
+            return View("NotFound");
+
         }
         
     }

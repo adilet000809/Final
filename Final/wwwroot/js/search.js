@@ -29,7 +29,7 @@
                     diameter: this.tireForm.diameter,
                 }
             };
-            this.$http.get('https://localhost:5001/api/tires', options).then(
+            this.$http.get('https://localhost:5001/api/Main/tires', options).then(
                 function (response) {
                     this.tires = response.body.products;
                     this.tires.forEach(t => t.image = "img/tire/" + t.image);
@@ -49,7 +49,7 @@
                     diameter: this.wheelForm.diameter,
                 }
             };
-            this.$http.get('https://localhost:5001/api/wheels', options).then(
+            this.$http.get('https://localhost:5001/api/Main/wheels', options).then(
                 function (response) {
                     this.wheels = response.body.products;
                     this.wheels.forEach(w => w.image = "img/wheel/" + w.image);

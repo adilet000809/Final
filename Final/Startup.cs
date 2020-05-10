@@ -47,6 +47,9 @@ namespace Final
             services.AddTransient<ICategoryRepository, CategoryRepository>();
             services.AddTransient<ITireRepository, TireRepository>();
             services.AddTransient<IWheelRepository, WheelRepository>();
+            services.AddTransient<ICartRepository, CartRepository>();
+            services.AddTransient<ICartItemRepository, CartItemRepository>();
+            services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

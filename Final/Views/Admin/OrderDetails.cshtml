@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Order";
+    Layout = "_Layout";
+}
+
+<h2>Order</h2>
+
+<div class="container mt-3">
+    <div class="row">
+        <table class="table table-hover">
+            <tr>
+                <th>ID</th>
+                <th>Products</th>
+                <th>Quanity</th>
+                <th>Price</th>
+            </tr>
+            @foreach (var item in ViewBag.Products)
+            {
+                <td>@item.Id</td>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Product.Price KZT</td>
+            }
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Total</td>
+                <td>@ViewBag.Total KZT</td>
+            </tr>
+        </table>
+    </div>
+    <div class="row">
+        <p><span class="font-weight-bold">Customer email: </span>@ViewBag.Order.Customer.Email</p><br/>
+        <p><span class="font-weight-bold">Phone: </span>@ViewBag.Order.Phone</p><br/>
+        <p><span class="font-weight-bold">Address: </span>@ViewBag.Order.Address</p><br/>
+        
+        <a class="btn btn-success mr-4" asp-controller="Admin" asp-action="AcceptOrder" asp-route-id="@ViewBag.Order.Id">Accept</a>
+        <a class="btn btn-danger" asp-controller="Admin" asp-action="DeleteOrder" asp-route-id="@ViewBag.Order.Id">Delete</a>
+    </div>
+</div>
