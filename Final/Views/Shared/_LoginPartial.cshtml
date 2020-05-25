@@ -8,7 +8,7 @@
         <li class="nav-item">
             <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
         </li>
-        @if (SignInManager.IsSignedIn(User) && User.IsInRole("User"))
+        @if (SignInManager.IsSignedIn(User))
         {
             <li class="nav-item">
                 <a asp-controller="Home" asp-action="Cart" class="nav-link text-dark">Cart</a>

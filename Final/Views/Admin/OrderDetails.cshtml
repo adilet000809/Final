@@ -28,12 +28,11 @@
                 <td>@ViewBag.Total KZT</td>
             </tr>
         </table>
+        <div><p><span class="font-weight-bold">Customer email: </span>@ViewBag.Order.Customer.Email</p><br/></div>
+        <div><p><span class="font-weight-bold">Phone: </span>@ViewBag.Order.Phone</p><br/></div>
+        <div><p><span class="font-weight-bold">Address: </span>@ViewBag.Order.Address</p><br/></div>
     </div>
     <div class="row">
-        <p><span class="font-weight-bold">Customer email: </span>@ViewBag.Order.Customer.Email</p><br/>
-        <p><span class="font-weight-bold">Phone: </span>@ViewBag.Order.Phone</p><br/>
-        <p><span class="font-weight-bold">Address: </span>@ViewBag.Order.Address</p><br/>
-        
         <a class="btn btn-success mr-4" asp-controller="Admin" asp-action="AcceptOrder" asp-route-id="@ViewBag.Order.Id">Accept</a>
         <a class="btn btn-danger" asp-controller="Admin" asp-action="DeleteOrder" asp-route-id="@ViewBag.Order.Id">Delete</a>
     </div>

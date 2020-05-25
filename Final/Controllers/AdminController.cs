@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Final.Models;
 using Final.Repositories;
+using Final.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using IHostingEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
@@ -24,6 +26,7 @@ namespace Final.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly ICartRepository _cartRepository;
         private readonly ICartItemRepository _cartItemRepository;
+        private readonly IEmailSender _emailSender;
         private static IHostingEnvironment _appEnvironment;
 
         public AdminController(RoleManager<IdentityRole> roleManager, 
@@ -34,6 +37,7 @@ namespace Final.Controllers
             IOrderRepository orderRepository,
             ICartRepository cartRepository,
             ICartItemRepository cartItemRepository,
+            IEmailSender emailSender,
             IHostingEnvironment appEnvironment)
         {
             _roleManager = roleManager;
@@ -45,6 +49,7 @@ namespace Final.Controllers
             _orderRepository = orderRepository;
             _cartRepository = cartRepository;
             _cartItemRepository = cartItemRepository;
+            _emailSender = emailSender;
         }
 
         private static string UploadImageTire(CreateTireViewModel model)
@@ -685,6 +690,12 @@ namespace Final.Controllers
             {
                 order.IsAccepted = true;
                 _orderRepository.Update(order);
+                var user = _userManager.FindByIdAsync(order.CustomerId).Result;
+                var email = user.Email;
+                var subject = order.Id.ToString();
+                var message = "Dear " + user.UserName + ". Your order: " + order.Id +
+                              " is confirmed. Our manager will contact you very soon";
+                _emailSender.SendEmailAsync(email, subject, message);
                 return RedirectToAction("ListOrders");
             }
             ViewBag.ErrorMessage = $"Order cannot be found";
