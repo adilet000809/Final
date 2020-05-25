@@ -71,8 +71,8 @@ namespace Final.Controllers
             {
                 products = products.Where(tire => tire.Diameter == diameter);
             }
-            products = products.Skip(( int.Parse(page) - 1) * pageSize).Take(pageSize);
             var paginationModel = new PaginationModel(int.Parse(page), pageSize, products.Count());
+            products = products.Skip(( int.Parse(page) - 1) * pageSize).Take(pageSize);
             var ivm = new TirePaginationViewModel { PaginationModel = paginationModel, Products = products };
             return ivm;
         }
@@ -105,8 +105,8 @@ namespace Final.Controllers
             {
                 wheels = wheels.Where(wheel => wheel.Diameter == double.Parse(diameter));
             }
-            wheels = wheels.Skip(( int.Parse(page) - 1) * pageSize).Take(pageSize);
             var paginationModel = new PaginationModel(int.Parse(page), pageSize, wheels.Count());
+            wheels = wheels.Skip(( int.Parse(page) - 1) * pageSize).Take(pageSize);
             var ivm = new WheelPaginationViewModel { PaginationModel = paginationModel, Products = wheels };
             return ivm;
         }

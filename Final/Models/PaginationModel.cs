@@ -20,7 +20,7 @@ namespace Final.Models
             PageNumber = pageNumber;
             PageSize = pageSize;
             TotalItems = totalItems;
-            TotalPages = (int) Math.Ceiling(totalItems / (double)pageSize) + 1;
+            TotalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)pageSize);
         }
     }
 }
